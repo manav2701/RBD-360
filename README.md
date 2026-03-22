@@ -19,6 +19,61 @@ The RUG360 dataset is intended for research in **video quality assessment (VQA),
 1. Benchmark their video quality models.
 2. Train and evaluate new VQA algorithms.
 3. Study the impact of real-world distortions in 360° videos.
+# Reproducibility
+
+All experiments can be reproduced using the software versions and commands listed below. The evaluation pipeline is fully scripted (`evaluate.sh`, provided in this repository).
+
+---
+
+## Software environment
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| FFmpeg | 7.0.3 | Encoding (H.264, H.265, VP9) and decoding |
+| libvmaf | 3.0.0 | VMAF, PSNR, SSIM computation |
+| Python | 3.11+ | Result aggregation and plotting |
+
+> **Note on FFmpeg build:** libvmaf support must be compiled in. Build with `--enable-libvmaf` and link against libvmaf ≥ 3.0.0. A pre-built static binary will not include this by default.
+
+---
+
+## Encoder presets
+
+### H.264 (libx264)
+```
+-c:v libx264 -preset medium -crf <QP>
+```
+
+### H.265 (libx265)
+```
+-c:v libx265 -preset medium -crf <QP>
+```
+
+### VP9 (libvpx-vp9)
+```
+-c:v libvpx-vp9 -deadline good -cpu-used 2 -b:v 0 -crf <QP>
+```
+
+QP values used: **22, 32, 42**. Bitrate targets used: **500, 1500, 3000 kbps**.
+
+---
+
+## Evaluation pipeline
+
+Run `evaluate.sh` from the repository root. It expects source sequences in `./sequences/` as raw YUV files and writes per-clip JSON results to `./results/`.
+
+```bash
+bash evaluate.sh
+```
+
+To verify your tool versions before running:
+
+```bash
+ffmpeg -version | head -1
+ffmpeg -filters | grep vmaf
+```
+
+---
 
 ## Affiliations
 
